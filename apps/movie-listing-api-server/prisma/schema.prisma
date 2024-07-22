@@ -1,0 +1,59 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Rating {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ratingValue Int?
+  movie       Movie?   @relation(fields: [movieId], references: [id])
+  movieId     String?
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+}
+
+model Comment {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  content       String?
+  parentComment String?
+  movie         Movie?   @relation(fields: [movieId], references: [id])
+  movieId       String?
+  user          User?    @relation(fields: [userId], references: [id])
+  userId        String?
+}
+
+model Movie {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String?
+  description String?
+  releaseDate DateTime?
+  user        User?     @relation(fields: [userId], references: [id])
+  userId      String?
+  ratings     Rating[]
+  comments    Comment[]
+}
+
+model User {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  firstName String?
+  lastName  String?
+  username  String    @unique
+  email     String?   @unique
+  password  String
+  roles     Json
+  movies    Movie[]
+  ratings   Rating[]
+  comments  Comment[]
+}
